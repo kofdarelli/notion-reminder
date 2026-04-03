@@ -42,11 +42,11 @@ node src/cli.js digest
 ## Environment Variables
 
 - `NOTION_PAGE_ID`
-  - Defaults to `ff79f817-b086-4967-847c-4f6b7ab7c45c`
+  - Your Notion page ID
 - `NOTION_DATABASE_ID`
-  - Defaults to `521e2f47-ccc9-45d1-97c9-3a03a7482d59`
+  - Your Notion database ID
 - `NOTION_DATA_SOURCE_ID`
-  - Defaults to `5da5fd21-b659-4a59-8388-d91abd28f95e`
+  - Your Notion data source ID
 - `TIME_ZONE`
   - Defaults to `Asia/Beirut`
 - `DEADLINE_WINDOW_DAYS`
