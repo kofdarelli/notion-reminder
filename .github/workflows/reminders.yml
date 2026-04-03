@@ -1,0 +1,54 @@
+name: Notion Reminders
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Run mode: auto, digest, or urgent"
+        required: false
+        default: "auto"
+
+jobs:
+  reminders:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run reminder service
+        env:
+          MODE: ${{ github.event.inputs.mode || 'auto' }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_API_VERSION: ${{ vars.NOTION_API_VERSION }}
+          NOTION_PAGE_ID: ${{ vars.NOTION_PAGE_ID }}
+          NOTION_DATABASE_ID: ${{ vars.NOTION_DATABASE_ID }}
+          NOTION_DATA_SOURCE_ID: ${{ vars.NOTION_DATA_SOURCE_ID }}
+          TIME_ZONE: ${{ vars.TIME_ZONE }}
+          DEADLINE_WINDOW_DAYS: ${{ vars.DEADLINE_WINDOW_DAYS }}
+          DIGEST_HOURS: ${{ vars.DIGEST_HOURS }}
+          URGENT_HOUR: ${{ vars.URGENT_HOUR }}
+          EMAIL_PROVIDER: ${{ vars.EMAIL_PROVIDER }}
+          SMTP_HOST: ${{ vars.SMTP_HOST }}
+          SMTP_PORT: ${{ vars.SMTP_PORT }}
+          SMTP_SECURITY: ${{ vars.SMTP_SECURITY }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_APP_PASSWORD: ${{ secrets.SMTP_APP_PASSWORD }}
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          GMAIL_SENDER_EMAIL: ${{ secrets.GMAIL_SENDER_EMAIL }}
+          GMAIL_REDIRECT_URI: ${{ vars.GMAIL_REDIRECT_URI }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+        run: node src/cli.js "$MODE"

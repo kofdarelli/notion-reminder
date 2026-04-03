@@ -1,0 +1,16 @@
+{
+  "name": "notion-reminder",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Free Notion study reminders via the Gmail API and GitHub Actions.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "digest": "node src/cli.js digest",
+    "urgent": "node src/cli.js urgent",
+    "auto": "node src/cli.js auto",
+    "gmail-auth": "node src/cli.js gmail-auth",
+    "test": "node tests/run-tests.js"
+  }
+}
