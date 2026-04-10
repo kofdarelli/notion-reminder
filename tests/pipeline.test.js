@@ -62,13 +62,29 @@ test("prepareReminderPayload handles mixed data", () => {
         dueDate: "2026-03-30",
         isAssignment: true,
         course: "EECE 338"
+      },
+      {
+        title: "Today deadline",
+        progress: "pending",
+        dueDate: "2026-03-31",
+        isAssignment: true,
+        course: "EECE 321"
+      },
+      {
+        title: "Tomorrow deadline",
+        progress: "pending",
+        dueDate: "2026-04-01",
+        isAssignment: true,
+        course: "EECE 334"
       }
     ],
     timeZone: "Asia/Beirut",
     windowDays: 7
   });
 
-  assert.match(payload.text, /Monday task/);
-  assert.match(payload.text, /Overdue deadline/);
   assert.match(payload.text, /Tuesday task/);
+  assert.match(payload.text, /Today deadline/);
+  assert.match(payload.text, /Tomorrow deadline/);
+  assert.doesNotMatch(payload.text, /Monday task/);
+  assert.doesNotMatch(payload.text, /Overdue deadline/);
 });

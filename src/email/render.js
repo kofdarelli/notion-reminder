@@ -81,8 +81,7 @@ function renderHtml(payload) {
   const { overdue, today, upcoming, subject, generatedAt } = payload;
   
   const content = [
-    renderHtmlSection("OVERDUE", overdue, "overdue"),
-    renderHtmlSection("YET TO DO", today, "today"),
+    renderHtmlSection("TODAY'S TASKS", today, "today"),
     renderHtmlSection("UPCOMING DEADLINES", upcoming, "upcoming")
   ].join("");
 
@@ -119,18 +118,12 @@ function joinSections(sections) {
 }
 
 function buildDigestPayload({ nowContext, checklistItems, deadlineItems, runLabel, runType, timeZone, windowDays }) {
-  const overdueChecklist = checklistItems.filter((item) => item.isOverdueInWeek);
   const todayChecklist = checklistItems.filter((item) => item.isToday);
-  const overdueDeadlines = deadlineItems.filter((item) => item.isOverdue);
   const upcomingDeadlines = deadlineItems.filter(
     (item) => item.daysUntilDue >= 0 && item.daysUntilDue <= windowDays
   );
 
   const sections = [
-    {
-      title: "Overdue",
-      lines: [...overdueChecklist.map(formatChecklistLine), ...overdueDeadlines.map(formatDeadlineLine)]
-    },
     {
       title: "Today's Tasks",
       lines: todayChecklist.map(formatChecklistLine)
@@ -145,16 +138,16 @@ function buildDigestPayload({ nowContext, checklistItems, deadlineItems, runLabe
   const finalBody =
     body ||
     [
-      "All clear for now.",
+      "All clear for today.",
       "",
-      `No overdue tasks or deadlines were found within the next ${windowDays} days.`
+      `No tasks are scheduled for today and no deadlines are due within the next ${windowDays} days.`
     ].join("\n");
 
   const generatedAt = `${String(nowContext.hour).padStart(2, "0")}:${String(nowContext.minute).padStart(2, "0")} ${timeZone}`;
   const subject = `Study Digest - ${nowContext.subjectLabel}`;
 
   const html = renderHtml({
-    overdue: [...overdueChecklist, ...overdueDeadlines],
+    overdue: [],
     today: todayChecklist,
     upcoming: upcomingDeadlines,
     subject,
@@ -171,18 +164,14 @@ function buildDigestPayload({ nowContext, checklistItems, deadlineItems, runLabe
 }
 
 function buildUrgentPayload({ nowContext, checklistItems, deadlineItems, runType, timeZone }) {
-  const overdueChecklist = checklistItems.filter((item) => item.isOverdueInWeek);
-  const overdueDeadlines = deadlineItems.filter((item) => item.isOverdue);
-  const imminentDeadlines = deadlineItems.filter((item) => item.daysUntilDue >= 0 && item.daysUntilDue <= 1);
+  const todayChecklist = checklistItems.filter((item) => item.isToday);
+  const todayDeadlines = deadlineItems.filter((item) => item.daysUntilDue === 0);
+  const todayItems = [...todayChecklist, ...todayDeadlines];
 
   const sections = [
     {
-      title: "Overdue",
-      lines: [...overdueChecklist.map(formatChecklistLine), ...overdueDeadlines.map(formatDeadlineLine)]
-    },
-    {
-      title: "Due Soon",
-      lines: imminentDeadlines.map(formatDeadlineLine)
+      title: "Today's Tasks",
+      lines: [...todayChecklist.map(formatChecklistLine), ...todayDeadlines.map(formatDeadlineLine)]
     }
   ];
 
@@ -192,12 +181,12 @@ function buildUrgentPayload({ nowContext, checklistItems, deadlineItems, runType
   }
 
   const generatedAt = `${String(nowContext.hour).padStart(2, "0")}:${String(nowContext.minute).padStart(2, "0")} ${timeZone}`;
-  const subject = `Urgent Deadlines - ${nowContext.subjectLabel}`;
+  const subject = `Today's Tasks - ${nowContext.subjectLabel}`;
 
   const html = renderHtml({
-    overdue: [...overdueChecklist, ...overdueDeadlines],
-    today: [], // Not showing today's non-urgent tasks in urgent mail
-    upcoming: imminentDeadlines,
+    overdue: [],
+    today: todayItems,
+    upcoming: [],
     subject,
     generatedAt
   });
@@ -206,7 +195,7 @@ function buildUrgentPayload({ nowContext, checklistItems, deadlineItems, runType
     subject,
     generatedAt,
     runType,
-    text: ["Urgent reminder", "", body].join("\n"),
+    text: ["Today reminder", "", body].join("\n"),
     html
   };
 }

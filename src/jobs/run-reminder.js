@@ -31,6 +31,19 @@ async function runReminder(mode = "auto", env = process.env) {
   const nowContext = getZonedDateParts(new Date(), config.timeZone);
   const runType = resolveRunType(mode, config, nowContext);
 
+  console.log(
+    [
+      "Reminder runtime context:",
+      `mode=${mode}`,
+      `resolvedRunType=${runType || "none"}`,
+      `timeZone=${config.timeZone}`,
+      `zonedDate=${nowContext.dateKey}`,
+      `zonedTime=${String(nowContext.hour).padStart(2, "0")}:${String(nowContext.minute).padStart(2, "0")}`,
+      `digestHours=${config.digestHours.join(",") || "(none)"}`,
+      `urgentHour=${config.urgentHour}`
+    ].join(" ")
+  );
+
   if (!runType) {
     console.log(`No reminder scheduled for ${nowContext.hour}:00 in ${config.timeZone}.`);
     return { sent: false, skipped: true };
