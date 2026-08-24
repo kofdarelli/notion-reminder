@@ -42,11 +42,11 @@ node src/cli.js digest
 ## Environment Variables
 
 - `NOTION_PAGE_ID`
-  - Your Notion page ID
+  - Your Notion page ID. Required and intentionally has no code default.
 - `NOTION_DATABASE_ID`
-  - Your Notion database ID
+  - Your Notion database ID. Required when `NOTION_DATA_SOURCE_ID` is not set.
 - `NOTION_DATA_SOURCE_ID`
-  - Your Notion data source ID
+  - Your Notion data source ID. Required when `NOTION_DATABASE_ID` is not set.
 - `TIME_ZONE`
   - Defaults to `Asia/Beirut`
 - `DEADLINE_WINDOW_DAYS`

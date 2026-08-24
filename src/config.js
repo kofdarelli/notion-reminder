@@ -1,8 +1,8 @@
 const DEFAULTS = {
   notionApiVersion: "2022-06-28",
-  notionPageId: "ff79f817-b086-4967-847c-4f6b7ab7c45c",
-  notionDatabaseId: "521e2f47-ccc9-45d1-97c9-3a03a7482d59",
-  notionDataSourceId: "5da5fd21-b659-4a59-8388-d91abd28f95e",
+  notionPageId: "",
+  notionDatabaseId: "",
+  notionDataSourceId: "",
   timeZone: "Asia/Beirut",
   deadlineWindowDays: 7,
   digestHours: [7, 20],
@@ -80,6 +80,10 @@ function validateConfig(config) {
   const missing = [];
 
   if (!config.notionToken) missing.push("NOTION_TOKEN");
+  if (!config.notionPageId) missing.push("NOTION_PAGE_ID");
+  if (!config.notionDataSourceId && !config.notionDatabaseId) {
+    missing.push("NOTION_DATA_SOURCE_ID or NOTION_DATABASE_ID");
+  }
 
   if (config.emailProvider === "gmail-api") {
     if (!config.gmailClientId) missing.push("GMAIL_CLIENT_ID");

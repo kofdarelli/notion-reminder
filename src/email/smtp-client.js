@@ -152,12 +152,13 @@ class SmtpSession {
     });
   }
 
-  async send(command, expectedCodes) {
+  async send(command, expectedCodes, { sensitive = false } = {}) {
     this.socket.write(`${command}\r\n`);
     const response = await this.readResponse();
 
     if (!expectedCodes.some((code) => response.startsWith(String(code)))) {
-      throw new Error(`SMTP command failed (${command}): ${response}`);
+      const commandForError = sensitive ? "[redacted credential]" : command;
+      throw new Error(`SMTP command failed (${commandForError}): ${response}`);
     }
 
     return response;
@@ -232,8 +233,8 @@ async function sendEmail({
   }
 
   await session.send("AUTH LOGIN", [334]);
-  await session.send(encodeBase64(username), [334]);
-  await session.send(encodeBase64(password), [235]);
+  await session.send(encodeBase64(username), [334], { sensitive: true });
+  await session.send(encodeBase64(password), [235], { sensitive: true });
   await session.send(`MAIL FROM:<${from}>`, [250]);
   await session.send(`RCPT TO:<${to}>`, [250, 251]);
   await session.sendData(createMessage({ from, to, subject, text, html }));
@@ -243,5 +244,6 @@ async function sendEmail({
 
 module.exports = {
   createMessage,
+  SmtpSession,
   sendEmail
 };
