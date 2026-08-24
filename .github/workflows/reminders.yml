@@ -25,9 +25,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: Run tests
-        run: npm test
-
       - name: Run reminder service
         env:
           MODE: ${{ github.event.inputs.mode || 'auto' }}

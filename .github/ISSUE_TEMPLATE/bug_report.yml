@@ -1,0 +1,40 @@
+name: Bug report
+description: Report a reproducible reminder, scheduling, Notion, or email problem.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the actual and expected behavior without including credentials or private Notion content.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: Include the command, sanitized configuration, timezone, and relevant task/deadline shape.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options: [Scheduling, Notion page tasks, Notion database deadlines, Gmail SMTP, Gmail API, Email rendering, GitHub Actions]
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs
+      description: Remove tokens, email addresses, IDs, and private content.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues.
+          required: true
+        - label: I removed all credentials and private content.
+          required: true
