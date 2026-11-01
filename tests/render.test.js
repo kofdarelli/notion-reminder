@@ -10,7 +10,6 @@ test("buildEmailPayload suppresses empty urgent emails", () => {
       hour: 13,
       minute: 0
     },
-    checklistItems: [],
     deadlineItems: [],
     runType: "urgent",
     timeZone: "Asia/Beirut",
@@ -27,10 +26,6 @@ test("buildEmailPayload includes upcoming deadlines but excludes overdue items",
       hour: 7,
       minute: 0
     },
-    checklistItems: [
-      { title: "Carryover task", weekday: "Monday", isOverdueInWeek: true, isToday: false },
-      { title: "Today task", weekday: "Tuesday", isOverdueInWeek: false, isToday: true }
-    ],
     deadlineItems: [
       { title: "Urgent assignment", isOverdue: true, dueLabel: "1 day overdue", isAssignment: true, course: "EECE 321" },
       { title: "Today quiz", isOverdue: false, dueLabel: "due today", daysUntilDue: 0, isAssignment: false, course: "EECE 334" },
@@ -42,10 +37,9 @@ test("buildEmailPayload includes upcoming deadlines but excludes overdue items",
   });
 
   assert.match(payload.subject, /^Study Digest - Tue Mar 31$/);
-  assert.match(payload.text, /Today's Tasks/);
+  assert.doesNotMatch(payload.text, /Today's Tasks/);
   assert.match(payload.text, /Upcoming Deadlines/);
-  assert.match(payload.text, /Today task/);
+  assert.match(payload.text, /Today quiz/);
   assert.match(payload.text, /Tomorrow quiz/);
-  assert.doesNotMatch(payload.text, /Carryover task/);
   assert.doesNotMatch(payload.text, /Urgent assignment/);
 });

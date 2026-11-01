@@ -1,21 +1,11 @@
-const { classifyChecklistItems } = require("../domain/checklist");
 const { classifyDeadlineItems } = require("../domain/deadlines");
 const { buildEmailPayload } = require("../email/render");
 
-function prepareReminderPayload({
-  runType,
-  nowContext,
-  rawChecklistItems,
-  rawDeadlineItems,
-  timeZone,
-  windowDays
-}) {
-  const checklistItems = classifyChecklistItems(rawChecklistItems, nowContext);
+function prepareReminderPayload({ runType, nowContext, rawDeadlineItems, timeZone, windowDays }) {
   const deadlineItems = classifyDeadlineItems(rawDeadlineItems, nowContext);
 
   return buildEmailPayload({
     nowContext,
-    checklistItems,
     deadlineItems,
     runType,
     timeZone,

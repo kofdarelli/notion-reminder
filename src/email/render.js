@@ -31,10 +31,6 @@ function bullet(line) {
   return `- ${line}`;
 }
 
-function formatChecklistLine(item) {
-  return bullet(`${item.title} (${item.weekday})`);
-}
-
 function formatDeadlineLine(item) {
   const coursePart = item.course ? ` [${item.course}]` : "";
   const typePart = item.isAssignment ? "Assignment" : "Study item";
@@ -81,7 +77,7 @@ function renderHtml(payload) {
   const { overdue, today, upcoming, subject, generatedAt } = payload;
   
   const content = [
-    renderHtmlSection("TODAY'S TASKS", today, "today"),
+    renderHtmlSection("DUE TODAY", today, "today"),
     renderHtmlSection("UPCOMING DEADLINES", upcoming, "upcoming")
   ].join("");
 
@@ -98,7 +94,7 @@ function renderHtml(payload) {
             <h1>Daily Reminder</h1>
           </div>
           <div class="content">
-            ${content || '<div style="padding: 40px; text-align: center; color: #888;">All clear! No tasks found.</div>'}
+            ${content || '<div style="padding: 40px; text-align: center; color: #888;">All clear! No upcoming deadlines.</div>'}
           </div>
           <div class="footer">
             Generated at ${generatedAt}<br>
@@ -117,38 +113,26 @@ function joinSections(sections) {
     .join("\n\n");
 }
 
-function buildDigestPayload({ nowContext, checklistItems, deadlineItems, runLabel, runType, timeZone, windowDays }) {
-  const todayChecklist = checklistItems.filter((item) => item.isToday);
+function buildDigestPayload({ nowContext, deadlineItems, runLabel, runType, timeZone, windowDays }) {
   const upcomingDeadlines = deadlineItems.filter(
     (item) => item.daysUntilDue >= 0 && item.daysUntilDue <= windowDays
   );
 
-  const sections = [
-    {
-      title: "Today's Tasks",
-      lines: todayChecklist.map(formatChecklistLine)
-    },
+  const body = joinSections([
     {
       title: "Upcoming Deadlines",
       lines: upcomingDeadlines.map(formatDeadlineLine)
     }
-  ];
-
-  const body = joinSections(sections);
+  ]);
   const finalBody =
-    body ||
-    [
-      "All clear for today.",
-      "",
-      `No tasks are scheduled for today and no deadlines are due within the next ${windowDays} days.`
-    ].join("\n");
+    body || ["All clear.", "", `No deadlines are due within the next ${windowDays} days.`].join("\n");
 
   const generatedAt = `${String(nowContext.hour).padStart(2, "0")}:${String(nowContext.minute).padStart(2, "0")} ${timeZone}`;
   const subject = `Study Digest - ${nowContext.subjectLabel}`;
 
   const html = renderHtml({
     overdue: [],
-    today: todayChecklist,
+    today: [],
     upcoming: upcomingDeadlines,
     subject,
     generatedAt
@@ -163,29 +147,25 @@ function buildDigestPayload({ nowContext, checklistItems, deadlineItems, runLabe
   };
 }
 
-function buildUrgentPayload({ nowContext, checklistItems, deadlineItems, runType, timeZone }) {
-  const todayChecklist = checklistItems.filter((item) => item.isToday);
+function buildUrgentPayload({ nowContext, deadlineItems, runType, timeZone }) {
   const todayDeadlines = deadlineItems.filter((item) => item.daysUntilDue === 0);
-  const todayItems = [...todayChecklist, ...todayDeadlines];
 
-  const sections = [
+  const body = joinSections([
     {
-      title: "Today's Tasks",
-      lines: [...todayChecklist.map(formatChecklistLine), ...todayDeadlines.map(formatDeadlineLine)]
+      title: "Due Today",
+      lines: todayDeadlines.map(formatDeadlineLine)
     }
-  ];
-
-  const body = joinSections(sections);
+  ]);
   if (!body) {
     return null;
   }
 
   const generatedAt = `${String(nowContext.hour).padStart(2, "0")}:${String(nowContext.minute).padStart(2, "0")} ${timeZone}`;
-  const subject = `Today's Tasks - ${nowContext.subjectLabel}`;
+  const subject = `Due Today - ${nowContext.subjectLabel}`;
 
   const html = renderHtml({
     overdue: [],
-    today: todayItems,
+    today: todayDeadlines,
     upcoming: [],
     subject,
     generatedAt
@@ -195,14 +175,13 @@ function buildUrgentPayload({ nowContext, checklistItems, deadlineItems, runType
     subject,
     generatedAt,
     runType,
-    text: ["Today reminder", "", body].join("\n"),
+    text: ["Due today reminder", "", body].join("\n"),
     html
   };
 }
 
 function buildEmailPayload({
   nowContext,
-  checklistItems,
   deadlineItems,
   runType,
   timeZone,
@@ -211,7 +190,6 @@ function buildEmailPayload({
   if (runType === "urgent") {
     return buildUrgentPayload({
       nowContext,
-      checklistItems,
       deadlineItems,
       runType,
       timeZone
@@ -221,8 +199,7 @@ function buildEmailPayload({
   const runLabel = nowContext.hour < 12 ? "Morning digest" : "Evening digest";
   return buildDigestPayload({
     nowContext,
-    checklistItems,
-    deadlineItems,
+      deadlineItems,
     runLabel,
     runType,
     timeZone,

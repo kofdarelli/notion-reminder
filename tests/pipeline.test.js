@@ -11,25 +11,10 @@ const nowContext = {
   weekdayIndex: 1
 };
 
-test("prepareReminderPayload handles page-only data", () => {
+test("prepareReminderPayload lists upcoming deadlines", () => {
   const payload = prepareReminderPayload({
     runType: "digest",
     nowContext,
-    rawChecklistItems: [{ title: "Tuesday task", weekday: "Tuesday" }],
-    rawDeadlineItems: [],
-    timeZone: "Asia/Beirut",
-    windowDays: 7
-  });
-
-  assert.match(payload.text, /Today's Tasks/);
-  assert.match(payload.text, /Tuesday task/);
-});
-
-test("prepareReminderPayload handles database-only data", () => {
-  const payload = prepareReminderPayload({
-    runType: "digest",
-    nowContext,
-    rawChecklistItems: [],
     rawDeadlineItems: [
       {
         title: "Database deadline",
@@ -47,14 +32,10 @@ test("prepareReminderPayload handles database-only data", () => {
   assert.match(payload.text, /Database deadline/);
 });
 
-test("prepareReminderPayload handles mixed data", () => {
+test("prepareReminderPayload keeps only deadlines inside the window", () => {
   const payload = prepareReminderPayload({
     runType: "digest",
     nowContext,
-    rawChecklistItems: [
-      { title: "Monday task", weekday: "Monday" },
-      { title: "Tuesday task", weekday: "Tuesday" }
-    ],
     rawDeadlineItems: [
       {
         title: "Overdue deadline",
@@ -76,15 +57,22 @@ test("prepareReminderPayload handles mixed data", () => {
         dueDate: "2026-04-01",
         isAssignment: true,
         course: "EECE 334"
+      },
+      {
+        title: "Far deadline",
+        progress: "pending",
+        dueDate: "2026-05-15",
+        isAssignment: true,
+        course: "EECE 334"
       }
     ],
     timeZone: "Asia/Beirut",
     windowDays: 7
   });
 
-  assert.match(payload.text, /Tuesday task/);
   assert.match(payload.text, /Today deadline/);
   assert.match(payload.text, /Tomorrow deadline/);
-  assert.doesNotMatch(payload.text, /Monday task/);
+  assert.doesNotMatch(payload.text, /Far deadline/);
+  assert.doesNotMatch(payload.text, /Tuesday task/);
   assert.doesNotMatch(payload.text, /Overdue deadline/);
 });

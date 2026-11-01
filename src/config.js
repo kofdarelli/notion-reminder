@@ -1,6 +1,5 @@
 const DEFAULTS = {
   notionApiVersion: "2022-06-28",
-  notionPageId: "",
   notionDatabaseId: "",
   notionDataSourceId: "",
   timeZone: "Asia/Beirut",
@@ -52,7 +51,6 @@ function loadConfig(env = process.env) {
   return {
     notionToken: env.NOTION_TOKEN || "",
     notionApiVersion: env.NOTION_API_VERSION || DEFAULTS.notionApiVersion,
-    notionPageId: env.NOTION_PAGE_ID || DEFAULTS.notionPageId,
     notionDatabaseId: env.NOTION_DATABASE_ID || DEFAULTS.notionDatabaseId,
     notionDataSourceId: env.NOTION_DATA_SOURCE_ID || DEFAULTS.notionDataSourceId,
     timeZone: env.TIME_ZONE || DEFAULTS.timeZone,
@@ -80,7 +78,6 @@ function validateConfig(config) {
   const missing = [];
 
   if (!config.notionToken) missing.push("NOTION_TOKEN");
-  if (!config.notionPageId) missing.push("NOTION_PAGE_ID");
   if (!config.notionDataSourceId && !config.notionDatabaseId) {
     missing.push("NOTION_DATA_SOURCE_ID or NOTION_DATABASE_ID");
   }

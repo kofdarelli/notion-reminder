@@ -30,7 +30,6 @@ jobs:
           MODE: ${{ github.event.inputs.mode || 'auto' }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_API_VERSION: ${{ secrets.NOTION_API_VERSION || vars.NOTION_API_VERSION }}
-          NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID || vars.NOTION_PAGE_ID }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID || vars.NOTION_DATABASE_ID }}
           NOTION_DATA_SOURCE_ID: ${{ secrets.NOTION_DATA_SOURCE_ID || vars.NOTION_DATA_SOURCE_ID }}
           TIME_ZONE: ${{ secrets.TIME_ZONE || vars.TIME_ZONE }}

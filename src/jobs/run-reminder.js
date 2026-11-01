@@ -2,7 +2,6 @@ const { loadConfig, validateConfig } = require("../config");
 const { sendReminderEmail } = require("../email/sender");
 const { NotionClient } = require("../notion-client");
 const { readDeadlineItems } = require("../notion/database-reader");
-const { readChecklistItems } = require("../notion/page-reader");
 const { prepareReminderPayload } = require("./pipeline");
 const { getZonedDateParts } = require("../utils/time");
 
@@ -56,20 +55,14 @@ async function runReminder(mode = "auto", env = process.env) {
     apiVersion: config.notionApiVersion
   });
 
-  const [rawChecklistItems, rawDeadlineItems] = await Promise.all([
-    readChecklistItems(notionClient, {
-      pageId: config.notionPageId
-    }),
-    readDeadlineItems(notionClient, {
-      dataSourceId: config.notionDataSourceId,
-      databaseId: config.notionDatabaseId
-    })
-  ]);
+  const rawDeadlineItems = await readDeadlineItems(notionClient, {
+    dataSourceId: config.notionDataSourceId,
+    databaseId: config.notionDatabaseId
+  });
 
   const payload = prepareReminderPayload({
     runType,
     nowContext,
-    rawChecklistItems,
     rawDeadlineItems,
     timeZone: config.timeZone,
     windowDays: config.deadlineWindowDays

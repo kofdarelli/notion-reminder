@@ -40,7 +40,6 @@ Create a Notion integration, share the study page and database with it, then add
 
 ```env
 NOTION_TOKEN=secret_...
-NOTION_PAGE_ID=...
 NOTION_DATABASE_ID=...
 RECIPIENT_EMAIL=you@example.com
 
@@ -66,11 +65,11 @@ npm run gmail-auth # Create a Gmail API refresh token
 ## Notion setup
 
 1. Create a Notion integration and keep its token private.
-2. Share the study scheduler page and study schedule database with the integration.
-3. Set `NOTION_PAGE_ID` and either `NOTION_DATABASE_ID` or `NOTION_DATA_SOURCE_ID`.
-4. Confirm that checklist tasks are unchecked until complete and deadline records use a real Notion date property.
+2. Share the study schedule database with the integration.
+3. Set either `NOTION_DATABASE_ID` or `NOTION_DATA_SOURCE_ID`.
+4. Confirm that deadline records use a real Notion date property.
 
-The service reads unchecked checklist items from the page and active deadline items from the database. Database dates remain the source of truth for deadline classification.
+The service reads active (not done) deadline items from the database and emails only those due within `DEADLINE_WINDOW_DAYS` (default 7). Overdue items and weekly to-dos are not included. Database dates remain the source of truth for deadline classification.
 
 ## Email providers
 
@@ -105,7 +104,6 @@ Add these required repository secrets:
 
 - `NOTION_TOKEN`
 - `RECIPIENT_EMAIL`
-- `NOTION_PAGE_ID`
 - either `NOTION_DATABASE_ID` or `NOTION_DATA_SOURCE_ID`
 
 For SMTP, also add `SMTP_USER` and `SMTP_APP_PASSWORD`. For the Gmail API, add `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`, and `GMAIL_SENDER_EMAIL`.
@@ -117,7 +115,6 @@ Configuration such as `TIME_ZONE`, `DEADLINE_WINDOW_DAYS`, `DIGEST_HOURS`, `URGE
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `NOTION_API_VERSION` | API default | Optional Notion API version override |
-| `NOTION_PAGE_ID` | — | Study scheduler page ID |
 | `NOTION_DATABASE_ID` | — | Deadline database ID |
 | `NOTION_DATA_SOURCE_ID` | — | Alternative to `NOTION_DATABASE_ID` |
 | `TIME_ZONE` | `Asia/Beirut` | IANA timezone used for scheduling |
